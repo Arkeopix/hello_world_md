@@ -3,10 +3,6 @@ align macro
     cnop 0,\1
     endm
 
-DisableInts macro               ; Disable interrupts
-    move #$2700, sr
-    endm
-
 VDPData     EQU $C00000 ; VDP Data port
 VDPControl  EQU $C00004 ; VDP Control Port
 

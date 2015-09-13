@@ -10,6 +10,8 @@ I test the software on the [mess](https://github.com/mamedev/mame) emulator, it 
 Some great ressources so far:
 * [hacking cult](http://www.hacking-cult.org/)
 * [Big Evil Corporation](http://bigevilcorporation.co.uk/) 
-* [megadrive devel wiki](http://wiki.megadrive.org/index.php?title=Main_Page) 
+* [megadrive devel wiki](http://wiki.megadrive.org/index.php?title=Main_Page)
+* [megadrive wiki](http://md.squee.co/Main_Page)
 * [Marc's realm](http://darkdust.net/writings/megadrive)
 * Source sample from the demo people over [pouet](http://www.pouet.net/)
+* MarkeyJester's m68k [tutorial](http://mrjester.hapisan.com/04_MC68/)

@@ -1,57 +1,56 @@
 Init:
-    DisableInts
-    move.b  ($A10001), d0               ; Initialization for TMSS
-    and.b   #$0F, d0
-    beq.s   @NoTMSS  
-    move.l  #"SEGA", ($A14000)    
-@NoTMSS
-    move.l #ClearMethods, -(sp)
-SetVDPDefaults:
-    lea (VDPControl), a0                ; Init VDP
-    move.w  #$8014, (a0)                ; No HINT, no HV latch
-    move.w  #$8174, (a0)                ; Enable Display
-    move.w  #$8230, (a0)                ; Scroll A: $C000
-    move.w  #$8407, (a0)                ; Scroll B: $E000
-    move.w  #$8578, (a0)                ; Sprites: $F000
-    move.w  #$8700, (a0)                ; Background: pal 0, color 0
-    move.w  #$8A00, (a0)                ; HInt every scanline
-    move.w  #$8B00, (a0)                ; No VINT, full scroll for H+V
-    move.w  #$8C81, (a0)                ; H40, no S/H, no interlace
-    move.w  #$8D3E, (a0)                ; HScroll: $F800
-    move.w  #$8F02, (a0)                ; Autoincrement: 2 bytes
-    move.w  #$9001, (a0)                ; Scroll size: 64x32
-    move.w  #$9100, (a0)                ; Hide window plane
-    move.w  #$9200, (a0)                ;  "     "      "
-    rts
-    
-ClearMethods:
-    move.l 	#CodeStart, -(sp)
-ClearEverything:
-	lea 	VDPCONTROL, a0
-	lea 	VDPDATA, a1
-    moveq #0, d0
-	move.w 	#$8114, VDPCONTROL          ; disable display
-    
-    SetCRAMAddr 0, a0                   ; Clear CRAM
-    moveq #8*4-1, d1
-@cc move.l d0, (a1)
-    dbf d1, @cc
-    
-    SetVRAMAddr 0, a0                   ; Clear VRAM
-    move.w  #$10000/4-1, d1
-@cv move.l  d0, (a1)
-    dbf     d1, @cv
+	move   #$2700,sr			; Disable interupts
+	tst.l  $A10008				; Test port A, ie a cold boot
+	bne.s  ColdBoot				; Cold boot means the console is a mess and needs initialization
+	tst.w  $A1000C				; Test post C, ie a reset
+ColdBoot:
+	bne.w  SoftReset			; SoftReset means the console was restarted with the actual game in memory, so we can just skip the init
+	move.b $A10001,d0			; Get hardware version
+	andi.b #$F,d0				; Compare; we mask it with $F because the number we're looking for is in the last 4 bits
+	beq.s  SkipSecurityCheck
+	move.l #'SEGA', $A14000		; yep, that's the security check...
+SkipSecurityCheck:
+	moveq  #0,d0				; clear d0
+	move.l #$C0000000,$C00004	; Set VDP to CRAM write
+	move.w #$3F,d7				; clear the CRAM
+VDP_ClrCRAM:	
+	move.w d0,$C00000			; write 0 to the data port
+	dbf    d7,VDP_ClrCRAM		; clear the cram
+	lea    $FFFF0000,a0 		; load start of ram into a0
+	move.w #$3FFF,d0            ; Clear $3FFF longwords.
+	moveq  #0,d1			    ; Clear d1.
+@clrRamLoop:
+	move.l d1,(a0)+				; Clear a long of ram
+	dbf    d0,@clrRamLoop		; Continue clearing RAM if there's anything left.
+SoftReset:
+	bsr.w   Init_Z80		    ; Initialize the Z80.
+	move    #$2300, sr		    ; Enable interrupts.
+	jmp     Main                ; Branch to main program.
+	nop
 
-	SetVSRAMAddr 0, a0                  ; Clear VSRAM
-    moveq #32-1, d1
-@cs	move.w #0, (a1)
-	dbf d1, @cs
-	
-    lea ($FF0000), a0                   ; Clear RAM
-    move.l #65536/4-4, d1               ; Except for 4 Longwords. We don't want
-@cr move.l d0, (a0)+                    ; to overwrite the stack...
-    dbf d1, @cr
+Init_Z80:
+	move.w  #$100,($A11100)					; Send the Z80 a bus request.
+	move.w  #$100,($A11200)					; Reset the Z80.
+Init_Z80_WaitZ80Loop:
+	btst	#0,($A11100)					; Has the Z80 reset?
+	bne.s	Init_Z80_WaitZ80Loop			; If not, keep checking.
+	lea     (Init_Z80_InitCode),a0			; Load the start address of the code to a0.
+	lea     ($A00000),a1					; Load the address of start of Z80 RAM to a1.
+	move.w  #Init_Z80_InitCode_End-Init_Z80_InitCode-1,d1	; Load the length of the Z80 code to d1.
+Init_Z80_LoadProgramLoop:
+	move.b  (a0)+,(a1)+					; Write a byte of Z80 data.
+	dbf	d1,Init_Z80_LoadProgramLoop		; If we have bytes left to write, write them.
+	move.w  #0,($A11200)				; Disable the Z80 reset.
+	move.w  #0,($A11100)				; Give the Z80 the bus back.
+	move.w  #$100,($A11200)				; Reset the Z80 again.
+	rts							        ; Return to sub.
 
-    move.b #$40, ($A10009)              ; init joy a
-    move.b #$40, ($A1000B)              ; init joy b
-    rts                                 ; DONE.
+;----------------------------------------------
+; Below is the code that the Z80 will execute.
+;----------------------------------------------
+Init_Z80_InitCode:
+	dc.w    $AF01, $D91F, $1127, $0021, $2600, $F977 
+	dc.w    $EDB0, $DDE1, $FDE1, $ED47, $ED4F, $D1E1
+	dc.w    $F108, $D9C1, $D1E1, $F1F9, $F3ED, $5636
+	dc.w    $E9E9
+Init_Z80_InitCode_End:

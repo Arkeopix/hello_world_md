@@ -1,8 +1,9 @@
 ;; hello world
 
-;;;;;;;;;;;;;;;;;;
-;; ROM START !! ;;
-;;;;;;;;;;;;;;;;;;
+	;; ROM START !!
+	;; dc: This directive evaluates the expressions in the operand field, and assigns the results to
+	;; the preceding symbol, in the format specified by the .size parameter. Argument
+	;; expressions may be numeric values, strings or symbols.
 	;; Vectors
 	dc.l 0						; $00 - Stack pointer
 	dc.l Init					; $04 - Code start
@@ -37,13 +38,13 @@
 	;; $C0-$FF - Reserved by Motorola
 	align $100
 	;; Actual header
-    dc.b "SEGA MEGA DRIVE "                    ; $100-$10F - Console name (usually 'SEGA MEGA DRIVE ' or 'SEGA GENESIS    ')
-    dc.b "(C)ARK  2015.SEP" 		           ; $110-$11F - Release date (usually '(C)XXXX YYYY.MMM' where XXXX is the company code, YYYY is the year and MMM - month)
-    dc.b "HELLO WORLD                                     " ; $120-$14F - Domestic name
-    dc.b "HELLO WORLD                                     "	; $150-$17F - International name
-    dc.b "GM 0x2A4242-00"					   ; $180-$18D - Version ('XX YYYYYYYYYYYY' where XX is the game type and YY the game code)
+    dc.b 'SEGA MEGA DRIVE '                    ; $100-$10F - Console name (usually 'SEGA MEGA DRIVE ' or 'SEGA GENESIS    ')
+    dc.b '(C)ARK  2015.SEP' 		           ; $110-$11F - Release date (usually '(C)XXXX YYYY.MMM' where XXXX is the company code, YYYY is the year and MMM - month)
+    dc.b 'HELLO WORLD                                     ' ; $120-$14F - Domestic name
+    dc.b 'HELLO WORLD                                     '	; $150-$17F - International name
+    dc.b 'GM 0x2A4242-00'					   ; $180-$18D - Version ('XX YYYYYYYYYYYY' where XX is the game type and YY the game code)
 	dc.w 0X0000								   ; $18E-$18F - Checksum
-	dc.b "JD              "					   ; $190-$19F - I/O Support, still dunno, seems to be the way to put JD in here... 
+	dc.b 'JD              '					   ; $190-$19F - I/O Support, still dunno, seems to be the way to put JD in here... 
     dc.l 0                      ; $1A0-$1A3 - ROM start
     dc.l ROM_End                ; $1A4-$1A7 - ROM end
     dc.l $00FF0000              ; $1A8-$1AB - RAM start (usually $00FF0000)
@@ -53,7 +54,7 @@
     dc.l $0020FFFF              ; $1B8-$1BB - SRAM end (default $0020FFFF)
 
     align $1F0
-    dc.b  "JUE             " 	; region info (Japan USA Europe)
+    dc.b  'JUE             ' 	; region info (Japan USA Europe)
 
 	;; One could do a lot better here, like some kind of BSOD, but my two cents is that the user should not have to deal
 	;; with errors, and i'm lazy, and i don't know how to do any better for the moment anyway.

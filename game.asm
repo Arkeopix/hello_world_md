@@ -90,7 +90,7 @@ Characters:
    dc.l 0x11111000
    dc.l 0x00000000
 	
-CodeStart:	
+Main:	
 	move.l #0xC0000003, 0x00C00004 ; Set up VDP to write to CRAM address 0x0000
 	lea Palette, a0
 	move.l #0x07, d0         ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
