@@ -41,7 +41,7 @@
     dc.b "(C)ARK  2015.SEP" 		           ; $110-$11F - Release date (usually '(C)XXXX YYYY.MMM' where XXXX is the company code, YYYY is the year and MMM - month)
     dc.b "HELLO WORLD                                     " ; $120-$14F - Domestic name
     dc.b "HELLO WORLD                                     "	; $150-$17F - International name
-    dc.b "HW XXXXXXXX-XX"					   ; $180-$18D - Version ('XX YYYYYYYYYYYY' where XX is the game type and YY the game code)
+    dc.b "GM 0x2A4242-00"					   ; $180-$18D - Version ('XX YYYYYYYYYYYY' where XX is the game type and YY the game code)
 	dc.w 0X0000								   ; $18E-$18F - Checksum
 	dc.b "JD              "					   ; $190-$19F - I/O Support, still dunno, seems to be the way to put JD in here... 
     dc.l 0                      ; $1A0-$1A3 - ROM start
@@ -54,7 +54,9 @@
 
     align $1F0
     dc.b  "JUE             " 	; region info (Japan USA Europe)
-    
+
+	;; One could do a lot better here, like some kind of BSOD, but my two cents is that the user should not have to deal
+	;; with errors, and i'm lazy, and i don't know how to do any better for the moment anyway.
 Error:
     jmp *
 Interrupt:
