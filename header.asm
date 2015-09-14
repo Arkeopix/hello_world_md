@@ -59,8 +59,9 @@
 	;; One could do a lot better here, like some kind of BSOD, but my two cents is that the user should not have to deal
 	;; with errors, and i'm lazy, and i don't know how to do any better for the moment anyway.
 Error:
-    jmp *
+  jmp *
 Interrupt:
 VBI:
+  rte
 HBI:
-    rte
+  rte

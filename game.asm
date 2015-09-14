@@ -16,16 +16,6 @@ Palette:
 	dc.w 0x0600 ; Colour E - Navy blue
 	dc.w 0x0060 ; Colour F - Dark green
 
-CharacterH:
-	dc.l 0x11000110
-	dc.l 0x11000110
-	dc.l 0x11000110
-	dc.l 0x11111110
-	dc.l 0x11000110
-	dc.l 0x11000110
-	dc.l 0x11000110
-	dc.l 0x00000000
-
 Characters:
    dc.l 0x11000110 ; Character 0 - H
    dc.l 0x11000110
@@ -91,7 +81,6 @@ Characters:
    dc.l 0x00000000
 	
 Main:	
-	move.l #0xC0000003, 0x00C00004 ; Set up VDP to write to CRAM address 0x0000
 	lea Palette, a0
 	move.l #0x07, d0         ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
  
